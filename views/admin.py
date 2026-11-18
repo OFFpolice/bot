@@ -49,7 +49,7 @@ class Admin:
         await self.sendMsg(text=text, keyboard=keyboard)
 
     async def config(self, **kwargs):
-        bot_config = get_config()
+        bot_config = await get_config()
         text = "✨✨✨✨✨✨✨✨✨✨✨✨\n\n" \
                "======**🏆 Настройки бота 🏆**======\n\n" \
                f"**🔸Инициализация меню:** обновление команд меню бота\n" \
@@ -792,17 +792,24 @@ class User:
     async def getUser(self, **kwargs):
         msg = await  self.retChat()
         WHERE, OFFSET, LIMIT = "", 0, 20
+        params = []
         if kwargs.get('page'):
             OFFSET = int(kwargs.get('page')[0])
         if kwargs.get('search'):
-            WHERE += f"AND BINARY full_name LIKE '%{kwargs.get('search')}%' OR BINARY username LIKE '%{kwargs.get('search')}%' "
+            WHERE += "AND (full_name LIKE ? OR username LIKE ?) "
+            search_val = f"%{kwargs.get('search')}%"
+            params.extend([search_val, search_val])
         userType = int(kwargs.get('type')[0]) if kwargs.get('type') else 0
-        userS = db.select(f"SELECT (SELECT COUNT(*) FROM chat_user WHERE admin={userType}) AS total_count,"
-                          f"(SELECT COUNT(*) FROM chat_user WHERE admin=0) AS state_count,"
-                          f"(SELECT COUNT(*) FROM chat_user WHERE admin=1) AS admin_count")
-        userList = db.select(
-            f"SELECT * FROM chat_user WHERE admin IN ({userType}) " + WHERE + " ORDER BY id DESC LIMIT %s  OFFSET %s",
-            (LIMIT, OFFSET))
+        userS = await db.select(
+            "SELECT (SELECT COUNT(*) FROM chat_user WHERE admin=?) AS total_count,"
+            "(SELECT COUNT(*) FROM chat_user WHERE admin=0) AS state_count,"
+            "(SELECT COUNT(*) FROM chat_user WHERE admin=1) AS admin_count",
+            (userType,),
+        )
+        userList = await db.select(
+            f"SELECT * FROM chat_user WHERE admin IN (?) " + WHERE + " ORDER BY id DESC LIMIT ? OFFSET ?",
+            tuple([userType] + params + [LIMIT, OFFSET]),
+        )
         if userList and len(userList) > 0:
             totalPages, currentPage = math.ceil(userS[0][0] / LIMIT), int(OFFSET / LIMIT) + 1
             upPage, dowPage = OFFSET - LIMIT, OFFSET + LIMIT
@@ -831,7 +838,7 @@ class User:
     async def userInfo(self, **kwargs):
         msg = await  self.retChat()
         userID = kwargs.get('user')[0]
-        user = db.select(f"SELECT * FROM chat_user WHERE id = {userID}")
+        user = await db.select("SELECT * FROM chat_user WHERE id = ?", (userID,))
         print(user)
         text = "✨✨✨✨✨✨✨✨✨✨✨✨\n" \
                f"💡**Профиль пользователя**💡\n\n" \
@@ -854,28 +861,28 @@ class User:
     async def setAdmin(self, **kwargs):
         msg = await  self.retChat()
         if kwargs.get('user'):
-            user = db.select(f"SELECT * FROM chat_user WHERE chat_id = {msg.chat.id}")
+            user = await db.select("SELECT * FROM chat_user WHERE chat_id = ?", (str(msg.chat.id),))
             if user and user[0][5] == 2:
                 pa = 1 if kwargs.get('p')[0] == '0' else 0
-                if db.update(f"UPDATE chat_user SET admin={pa} WHERE id={kwargs.get('user')[0]}"):
+                if await db.update("UPDATE chat_user SET admin=? WHERE id=?", (pa, kwargs.get('user')[0])):
                     await self.client.answer_callback_query(self.query.id, text='Права администратора обновлены', show_alert=True)
                     await self.backReview()
                     await self.userInfo(user=kwargs.get('user'))
                 else:
                     await self.client.answer_callback_query(self.query.id, text='Ошибка данных', show_alert=True)
-            elif user[0][5] == 1:
+            elif user and user[0][5] == 1:
                 await self.client.answer_callback_query(self.query.id, text='Ошибка: у вас нет прав на назначение администраторов',
                                                         show_alert=True)
             else:
                 await self.client.answer_callback_query(self.query.id, text='Ошибка: пользователь не найден',
                                                         show_alert=True)
     async def banUser(self,**kwargs):
-        user = db.select("SELECT * FROM chat_user WHERE id=%s", (kwargs.get('user')[0],))
+        user = await db.select("SELECT * FROM chat_user WHERE id=?", (kwargs.get('user')[0],))
         if user[0][4]==1:
-            db.update("UPDATE chat_user SET state=0 WHERE id=%s", (user[0][0],))
+            await db.update("UPDATE chat_user SET state=0 WHERE id=?", (user[0][0],))
             await self.reviewNotify(user=[user[0][0]])
         else:
-            db.update("UPDATE chat_user SET state=1 WHERE id=%s", (user[0][0],))
+            await db.update("UPDATE chat_user SET state=1 WHERE id=?", (user[0][0],))
             await self.reviewNotify(user=[user[0][0]])
         await self.userInfo(user=[kwargs.get('user')[0]])
     async def backReview(self,**kwargs):

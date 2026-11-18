@@ -68,6 +68,22 @@ def command(client: Client):
     )))
 
 
+async def main():
+    logging.critical('Запуск успешен')
+    await db.init_db()
+    await get_config()
+    logging.critical(f"Конфигурация загружена:{bot_config}")
+    scheduler.start()
+    schedulerObj = scheduler.add_job(convoyDriving, "interval", seconds=60 * 30, misfire_grace_time=60)
+    logging.critical(f"Таймер рассылки запущен:{schedulerObj}")
+    command(app)
+    await app.start()
+    try:
+        await idle()
+    finally:
+        await app.stop()
+
+
 if __name__ == '__main__':
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,13 +92,6 @@ if __name__ == '__main__':
         print('Бот уже запущен')
     else:
         try:
-            logging.critical('Запуск успешен')
-            bot_config = get_config()
-            logging.critical(f"Конфигурация загружена:{bot_config}")
-            scheduler.start()
-            schedulerObj = scheduler.add_job(convoyDriving, "interval", seconds=60 * 30, misfire_grace_time=60)
-            logging.critical(f"Таймер рассылки запущен:{schedulerObj}")
-            command(app)
-            app.run()
+            app.run(main())
         except Exception as e:
             logging.error(e)

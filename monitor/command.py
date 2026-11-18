@@ -71,7 +71,7 @@ async def admii_command(client: Client, message: Message):
 async def handle_chat_member_update(client: Client, update: ChatMemberUpdated):
     # print(update)
     if update.new_chat_member and update.new_chat_member.user.username == bot_config['botUserName'].replace('@', ''):
-        user = db.select("SELECT * FROM chat_user WHERE chat_id=%s", (update.from_user.id,))
+        user = await db.select("SELECT * FROM chat_user WHERE chat_id=?", (str(update.from_user.id),))
         print("Пользователь",user)
         if user:
             if  user[0][4]==0:
@@ -81,15 +81,15 @@ async def handle_chat_member_update(client: Client, update: ChatMemberUpdated):
                         if isPrivi == 1:
                             text = f"《[{update.chat.title}]({group.invite_link})》 " \
                                    f"— у бота недостаточно прав, ресурс будет снят с подборки, проверьте права"
-                            db.update("UPDATE group_list SET state=0 WHERE group_id=%s", (update.chat.id,))
+                            await db.update("UPDATE group_list SET state=0 WHERE group_id=?", (str(update.chat.id),))
                             return await client.send_message(chat_id=user[0][1], text=text)
-                        groupIs = db.select("SELECT * FROM group_list WHERE group_id=%s", (update.chat.id,))
+                        groupIs = await db.select("SELECT * FROM group_list WHERE group_id=?", (str(update.chat.id),))
                         print(groupIs)
                         if not groupIs:
                             text = f"《[{update.chat.title}]({group.invite_link})》 успешно добавлен, проверка прав пройдена"
-                            if db.insert(
-                                    "INSERT INTO group_list (group_id,username,title,type,total_people,url,chat_id) VALUES(%s,%s,%s,%s,%s,%s,%s)",
-                                    (group.id, group.username or "", group.title, group.type.name, group.members_count,
+                            if await db.insert(
+                                    "INSERT INTO group_list (group_id,username,title,type,total_people,url,chat_id) VALUES(?,?,?,?,?,?,?)",
+                                    (str(group.id), group.username or "", group.title, group.type.name, group.members_count,
                                      group.invite_link, user[0][0])):
                                 return await client.send_message(chat_id=user[0][1], text=text)
                         else:
@@ -97,16 +97,16 @@ async def handle_chat_member_update(client: Client, update: ChatMemberUpdated):
                                 text = f"《[{update.chat.title}](https://t.me/{update.chat.username})》" \
                                        f"Ваш ресурс заблокирован, обратитесь к администратору"
                                 return await client.send_message(chat_id=user[0][1], text=text)
-                            db.update(
-                                "UPDATE group_list SET title=%s,total_people=%s,url=%s,chat_id=%s WHERE group_id=%s",
-                                (group.title, group.members_count, group.invite_link, user[0][0], update.chat.id,))
+                            await db.update(
+                                "UPDATE group_list SET title=?,total_people=?,url=?,chat_id=? WHERE group_id=?",
+                                (group.title, group.members_count, group.invite_link, user[0][0], str(update.chat.id)))
                             text = f"《[{group.title}]({group.invite_link})》 уже существует, данные обновлены!"
                             return await  client.send_message(chat_id=user[0][1], text=text)
                     elif update.new_chat_member.status.name == 'MEMBER':
                         text = f"《[{update.chat.title}](https://t.me/{update.chat.username})》" \
                                f"— права администратора не обнаружены, ресурс будет снят с подборки, проверьте права!"
-                        db.update("UPDATE group_list SET state=0,label='Права администратора не обнаружены' WHERE group_id=%s",
-                                  (update.chat.id,))
+                        await db.update("UPDATE group_list SET state=0 WHERE group_id=?",
+                                  (str(update.chat.id),))
                         return await client.send_message(chat_id=user[0][1], text=text)
             else:
                 text = "Ваш аккаунт заблокирован, обратитесь к администратору"
@@ -115,7 +115,7 @@ async def handle_chat_member_update(client: Client, update: ChatMemberUpdated):
             print("Пользователь не найден",)
     elif update.old_chat_member  and update.old_chat_member.user.username == bot_config['botUserName'].replace('@', ''):
         print('Бот вышел из группы/канала')
-        group = db.select("SELECT * FROM group_list WHERE group_id=%s", (update.chat.id,))
+        group = await db.select("SELECT * FROM group_list WHERE group_id=?", (str(update.chat.id),))
         print(group)
         if group:
             if group[0][10] == 10:
@@ -123,7 +123,7 @@ async def handle_chat_member_update(client: Client, update: ChatMemberUpdated):
                        f"Ваш ресурс заблокирован, обратитесь к администратору"
                 return await client.send_message(chat_id=update.old_chat_member.invited_by.id, text=text)
             else:
-                db.update("UPDATE group_list SET state=0 WHERE group_id=%s",(update.chat.id,))
+                await db.update("UPDATE group_list SET state=0 WHERE group_id=?",(str(update.chat.id),))
                 text = f"《[{update.chat.title}](https://t.me/{update.chat.username})》" \
                            f"— бот вышел из группы/канала, ресурс снят с подборки!"
                 return await client.send_message(chat_id=update.old_chat_member.invited_by.id, text=text)

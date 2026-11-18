@@ -91,8 +91,8 @@ class Channel:
     async def index(self,**kwargs):
         OFFSET, LIMIT = int(kwargs.get('page')[0]) if kwargs.get('page') else 0, 30
         fleet = ChannelFleetList()
-        fleetList,count = fleet.get_fleet(OFFSET=OFFSET,LIMIT=LIMIT)
-        group_count= fleet.get_group_count()
+        fleetList,count = await fleet.get_fleet(OFFSET=OFFSET,LIMIT=LIMIT)
+        group_count= await fleet.get_group_count()
         keyboard = []
         text = f"Каналы — Зал подборок\n\n" \
                f"Количество подборок:{len(fleetList)}\n" \
@@ -121,7 +121,7 @@ class Channel:
     async def fleet_info(self,**kwargs):
         fleet_id = kwargs.get("fleet")[0]
         fleet=ChannelFleetList()
-        fleetInfo,group_list= fleet.get_fleet_one(id=fleet_id),fleet.get_fleet_group_list(id=fleet_id)
+        fleetInfo,group_list= await fleet.get_fleet_one(id=fleet_id), await fleet.get_fleet_group_list(id=fleet_id)
         if fleetInfo:
             text = f"**Название подборки：** {fleetInfo[1]}\n" \
                       f"**Описание：** {fleetInfo[2]}\n" \
@@ -178,7 +178,7 @@ class Channel:
         msg = await self.retChat()
         fleet = ChannelFleetList()
         fleet_id,group_id=kwargs.get('f')[0],kwargs.get('g')[0]
-        fleetInfo, group = fleet.get_fleet_one(id=fleet_id),await fleet.get_user_group_one(id=group_id)
+        fleetInfo, group = await fleet.get_fleet_one(id=fleet_id),await fleet.get_user_group_one(id=group_id)
         if group:
             if group[10] in [0,1,2]:
                 # print(group[1])

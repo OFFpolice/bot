@@ -1,11 +1,11 @@
 # Библиотеки бота
-from pyrogram import Client, filters
+from pyrogram import Client, filters, idle
 from pyrogram.errors import RPCError,FloodWait,BadRequest,ChannelPrivate
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply, ReplyKeyboardMarkup, \
     Message,ChatMemberUpdated,InputMediaVideo,InputMediaPhoto, MenuButton,BotCommand
 from urllib.parse import urlparse, parse_qs
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import os,re,time,requests,json,asyncio,uvloop,redis,qrcode,io,socket,hashlib,math,datetime,logging
+import os,re,time,requests,json,asyncio,uvloop,qrcode,io,socket,hashlib,math,datetime,logging
 from random import randint
 uvloop.install()
 
@@ -16,9 +16,7 @@ logging.basicConfig(
     filename='run.log'
 )
 
-
-
-redis_client = redis.Redis(host='172.18.0.2',port=6379,db=2,password='123456')
+DB_PATH = os.getenv("SQLITE_DB_PATH", "hutui.db")
 
 bot_config = {
     "botName":"Бот не настроен",
