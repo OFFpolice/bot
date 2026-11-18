@@ -31,10 +31,10 @@ class Index:
     async def welcome(self,**kwargs):
         msg = await self.retChat()
         user=self.data.get('user')
-        Reply = [['帮助']]
+        Reply = [['Помощь']]
         if user[5] in [1, 2]:
-            Reply = [['⚙管理页面']]
-        text = f"**欢迎使用:{bot_config.get('botName')}**\n\n" \
+            Reply = [['⚙Панель управления']]
+        text = f"**Добро пожаловать в {bot_config.get('botName')}**\n\n" \
                f"{bot_config.get('indexTxt')}\n\n"
         await msg.reply_text(text, reply_markup=ReplyKeyboardMarkup(Reply, resize_keyboard=True),
                                  disable_web_page_preview=True)
@@ -43,23 +43,23 @@ class Index:
         user=self.data.get('user')
         try:
             if user:
-                text = f"======🏆 车队首页 🏆======\n\n" \
-                       f"**🚀Telegram互推:**  @{bot_config.get('botUserName')}\n\n" \
-                       f"**UID {user[1]}** 尊敬的 {user[3]} 你好:\n\n" \
-                       f"**🔗纯中文互粉互推自助发布机器人🔗**\n\n" \
-                       f"**使用说明：**请将本机器人拉入你的[群组](https://t.me/{bot_config.get('botUserName').replace('@', '')}?startgroup=true)|[频道](https://t.me/{bot_config.get('botUserName').replace('@', '')}?startchannel=true)，并赋予管理员权限🔶\n" \
-                       f"**管理权限：**发布消息/编辑其他人的消息/删除其他人的消息/邀请其他人权限，缺失权限机器人不能正常工作\n\n" \
-                       f"⚠️严谨发布幼童/人兽/男同/血腥/暴力/重口/政治/军火等活动的参与【[详见公告](https://t.me/hufen/3)】\n"
+                text = f"======🏆 Главная страница 🏆======\n\n" \
+                       f"**🚀Telegram-взаимопиар:**  @{bot_config.get('botUserName')}\n\n" \
+                       f"**UID {user[1]}** Уважаемый(ая) {user[3]}, здравствуйте:\n\n" \
+                       f"**🔗Автоматический бот для взаимного продвижения каналов и групп🔗**\n\n" \
+                       f"**Инструкция:** добавьте этого бота в вашу [группу](https://t.me/{bot_config.get('botUserName').replace('@', '')}?startgroup=true)|[канал](https://t.me/{bot_config.get('botUserName').replace('@', '')}?startchannel=true) и выдайте права администратора🔶\n" \
+                       f"**Права администратора:** публикация сообщений / редактирование чужих сообщений / удаление чужих сообщений / приглашение пользователей (без этих прав бот не сможет работать)\n\n" \
+                       f"⚠️ Запрещено участие каналов и групп с запрещённым, противоправным или экстремистским контентом 【[Подробнее в правилах](https://t.me/hufen/3)】\n"
                 keyboard=[
-                    [InlineKeyboardButton("📍邀请机器人进群组",url=f"https://t.me/{bot_config['botUserName'].replace('@', '')}?startgroup=true"),
-                     InlineKeyboardButton("📍邀请机器人进频道",url=f"https://t.me/{bot_config['botUserName'].replace('@', '')}?startchannel=true")],
-                    [InlineKeyboardButton("⏺频道互推",callback_data="r/频道"),InlineKeyboardButton("⏺群组互推",callback_data="r/车队列表")],
-                    [InlineKeyboardButton("❔车队教程", url=f"https://t.me/{bot_config['publicGroup']}"),InlineKeyboardButton("📢互推交流群",url="https://t.me/hutui")],
+                    [InlineKeyboardButton("📍Добавить бота в группу",url=f"https://t.me/{bot_config['botUserName'].replace('@', '')}?startgroup=true"),
+                     InlineKeyboardButton("📍Добавить бота в канал",url=f"https://t.me/{bot_config['botUserName'].replace('@', '')}?startchannel=true")],
+                    [InlineKeyboardButton("⏺Взаимопиар каналов",callback_data="r/каналы"),InlineKeyboardButton("⏺Взаимопиар групп",callback_data="r/список_гр")],
+                    [InlineKeyboardButton("❔Инструкция", url=f"https://t.me/{bot_config['publicGroup']}"),InlineKeyboardButton("📢Чат взаимопиара",url="https://t.me/hutui")],
                 ]
                 await self.sendMsg(text=text,keyboard=keyboard)
         except (RPCError,Exception) as E:
             print(E)
-            await msg.reply_text(text=f'错误:请截图联系客服{E}')
+            await msg.reply_text(text=f'Ошибка: сделайте скриншот и обратитесь в поддержку {E}')
 
 class Channel:
     def __init__(self, Client:Client, Query:CallbackQuery=None, Msg:Message=None, Data=None):
@@ -94,12 +94,12 @@ class Channel:
         fleetList,count = fleet.get_fleet(OFFSET=OFFSET,LIMIT=LIMIT)
         group_count= fleet.get_group_count()
         keyboard = []
-        text = f"频道-车队大厅\n\n" \
-               f"车队数量:{len(fleetList)}\n" \
-               f"频道数量:{group_count}\n" \
-               f"图标介绍:\n" \
-               f"🚒发车/🕛等待 车队名|队内成员数-最大成员数|最小订阅需求\n\n" \
-               f"选择下方车队进入指定车队，然后选择你要申请的分组进行上车提交。" \
+        text = f"Каналы — Зал подборок\n\n" \
+               f"Количество подборок:{len(fleetList)}\n" \
+               f"Количество каналов:{group_count}\n" \
+               f"Обозначения:\n" \
+               f"🚒Запущена/🕛Ожидание Название|Участники/Макс|Мин. подписчиков\n\n" \
+               f"Выберите нужную подборку ниже, затем выберите свой канал для отправки заявки." \
 
         if fleetList:
             totalPages, currentPage = math.ceil(count / LIMIT), math.ceil(OFFSET / LIMIT) + 1
@@ -108,41 +108,41 @@ class Channel:
             for i in range(0, len(fleetList), step):
                 batch = fleetList[i:i + step]
                 for Cont in batch:
-                    row.append(InlineKeyboardButton(f"{'🚒' if Cont[4] == 1 else '🕛'} {Cont[1]}|{Cont[11]}/{Cont[6]}|{Cont[8]/1000}K",callback_data=f"r/频道车厢?fleet={Cont[0]}"))
+                    row.append(InlineKeyboardButton(f"{'🚒' if Cont[4] == 1 else '🕛'} {Cont[1]}|{Cont[11]}/{Cont[6]}|{Cont[8]/1000}K",callback_data=f"r/подборка?fleet={Cont[0]}"))
                 keyboard.append(row)
                 row = []
-            keyboard.append([InlineKeyboardButton(f"{'⬅️上一页' if upPage >= 0 else '-'}",callback_data=f"r/频道?page={upPage}" if upPage >= 0 else '-'),
-                            InlineKeyboardButton(f"{currentPage}/{totalPages}页", callback_data="-"),
-                            InlineKeyboardButton(f"️{'➡️下一页' if currentPage != totalPages else '-'}",callback_data=f"r/频道?page={dowPage}" if currentPage != totalPages else '-')])
+            keyboard.append([InlineKeyboardButton(f"{'⬅️Назад' if upPage >= 0 else '-'}",callback_data=f"r/каналы?page={upPage}" if upPage >= 0 else '-'),
+                            InlineKeyboardButton(f"{currentPage}/{totalPages} стр.", callback_data="-"),
+                            InlineKeyboardButton(f"️{'➡️Далее' if currentPage != totalPages else '-'}",callback_data=f"r/каналы?page={dowPage}" if currentPage != totalPages else '-')])
         else:
-            keyboard.append([InlineKeyboardButton(f"空/未发现车队", callback_data="-")])
-        keyboard.append([InlineKeyboardButton(f"返回", callback_data="r/首页")])
+            keyboard.append([InlineKeyboardButton(f"Пусто / подборок не найдено", callback_data="-")])
+        keyboard.append([InlineKeyboardButton(f"Назад", callback_data="r/главная")])
         await self.sendMsg(text=text,keyboard=keyboard)
     async def fleet_info(self,**kwargs):
         fleet_id = kwargs.get("fleet")[0]
         fleet=ChannelFleetList()
         fleetInfo,group_list= fleet.get_fleet_one(id=fleet_id),fleet.get_fleet_group_list(id=fleet_id)
         if fleetInfo:
-            text = f"**车队标题：** {fleetInfo[1]}\n" \
-                      f"**车队介绍：** {fleetInfo[2]}\n" \
-                      f"**当前/最大(成员)：** {fleetInfo[11]}/{fleetInfo[6]}\n" \
-                      f"**车队类型：** 频道\n" \
-                      f"**最低订阅：** {fleetInfo[8] / 10000} W人\n" \
-                      f"**最低阅读：**{fleetInfo[9]}\n\n" \
-                      "**成员列表：**\n"
+            text = f"**Название подборки：** {fleetInfo[1]}\n" \
+                      f"**Описание：** {fleetInfo[2]}\n" \
+                      f"**Участники (сейчас/макс)：** {fleetInfo[11]}/{fleetInfo[6]}\n" \
+                      f"**Тип подборки：** Канал\n" \
+                      f"**Мин. подписчиков：** {fleetInfo[8] / 1000} K\n" \
+                      f"**Мин. просмотров：**{fleetInfo[9]}\n\n" \
+                      "**Список участников：**\n"
             if group_list:
                 for index,group in enumerate(group_list):
                     text+=f"{index+1}.[{await truncate_string(group[3],20)}]({group[6]}) {round(group[5]/1000,1)}k\n"
             else:
-                text+="当前没有互推成员\n"
+                text+="Пока нет участников взаимопиара\n"
             keyboard=[]
             if fleetInfo[6]>fleetInfo[11]:
-                text+="\n✅车队还未满员,你可以申请!"
-                keyboard.append([InlineKeyboardButton(f"➕ 申请加入",callback_data=f"r/频道申请?fleet={fleetInfo[0]}&mi_me={fleetInfo[8]}")])
+                text+="\n✅ В подборке ещё есть места, можно подать заявку!"
+                keyboard.append([InlineKeyboardButton(f"➕ Подать заявку",callback_data=f"r/заявка?fleet={fleetInfo[0]}&mi_me={fleetInfo[8]}")])
             else:
-                text+="\n‼️车队已满,请申请其他车队!"
-            # keyboard.append([InlineKeyboardButton(f"🚨 举报", callback_data="r/频道举报")])
-            keyboard.append([InlineKeyboardButton(f"首页", callback_data="r/首页"),InlineKeyboardButton(f"返回", callback_data="r/频道")])
+                text+="\n‼️ Подборка заполнена, выберите другую!"
+            # keyboard.append([InlineKeyboardButton(f"🚨 Пожаловаться", callback_data="r/жалоба")])
+            keyboard.append([InlineKeyboardButton(f"Главная", callback_data="r/главная"),InlineKeyboardButton(f"Назад", callback_data="r/каналы")])
             await self.sendMsg(text=text,keyboard=keyboard)
     async def add_fleet(self,**kwargs):
         msg =await self.retChat()
@@ -152,13 +152,13 @@ class Channel:
             CF=ChannelFleetList(Msg=msg)
             my_group =await CF.get_user_group_list(id=user[0],member=member)
             if my_group:
-                text = "**选择频道**\n\n" \
-                       "以下只显示您满足要求的频道列表\n\n" \
-                       f"要求订阅:{round(int(member)/1000,1)}k\n" \
-                       "图示：🟢空闲🟡待审核🟣已上车🔴被禁用\n" \
-                       "已上车的频道再次申请会自动下车\n" \
-                       "请确认是否已经将机器人拉入并设置管理员\n\n" \
-                       "👇请选择一个提交"
+                text = "**Выбор канала**\n\n" \
+                       "Ниже показаны только каналы, подходящие под требования\n\n" \
+                       f"Требуется подписчиков:{round(int(member)/1000,1)}k\n" \
+                       "Статусы: 🟢Свободен 🟡На проверке 🟣В подборке 🔴Заблокирован\n" \
+                       "Повторная заявка уже участвующего канала снимет его с подборки\n" \
+                       "Убедитесь, что бот добавлен в канал и назначен администратором\n\n" \
+                       "👇 Выберите канал для отправки"
                 keyboard = []
                 for group in my_group:
                     ty_emoji= "🟢"
@@ -168,12 +168,12 @@ class Channel:
                         ty_emoji= "🟣"
                     elif group[10]==10:
                         ty_emoji="🔴"
-                    keyboard.append([InlineKeyboardButton(f"{ty_emoji} {group[3]}|{round(group[5]/1000,1)}k",callback_data=f"r/频道申请提交?f={fleet}&g={group[0]}")])
-                keyboard.append([InlineKeyboardButton("🏠 首页", callback_data="r/首页"),
-                                 InlineKeyboardButton("↩️ 返回", callback_data=f"r/频道车厢?fleet={fleet}")])
+                    keyboard.append([InlineKeyboardButton(f"{ty_emoji} {group[3]}|{round(group[5]/1000,1)}k",callback_data=f"r/отправка?f={fleet}&g={group[0]}")])
+                keyboard.append([InlineKeyboardButton("🏠 Главная", callback_data="r/главная"),
+                                 InlineKeyboardButton("↩️ Назад", callback_data=f"r/подборка?fleet={fleet}")])
                 await self.sendMsg(text=text,keyboard=keyboard)
             else:
-                return await self.client.answer_callback_query(self.query.id, text="⚠️未找到满足当前车队要求的频道，请按照相应订阅人数选择分组",show_alert=True)
+                return await self.client.answer_callback_query(self.query.id, text="⚠️ Не найдено каналов, подходящих по числу подписчиков для этой подборки",show_alert=True)
     async def submit_fleet(self,**kwargs):
         msg = await self.retChat()
         fleet = ChannelFleetList()
@@ -184,47 +184,47 @@ class Channel:
                 # print(group[1])
                 isPrivi = await isPrivileges(chatId=group[1],typeG=group[4])
                 if isPrivi == 1:
-                    return await self.client.answer_callback_query(self.query.id, text="⚠️该群没给机器人权限请检查",show_alert=True)
+                    return await self.client.answer_callback_query(self.query.id, text="⚠️ У бота недостаточно прав в этом канале/группе, проверьте настройки",show_alert=True)
                 elif isPrivi == 2:
-                    return await self.client.answer_callback_query(self.query.id, text="⛔机器人还未加入该群组或频道",show_alert=True)
+                    return await self.client.answer_callback_query(self.query.id, text="⛔ Бот ещё не добавлен в этот канал или группу",show_alert=True)
                 is_botList = await isBotBlacklist(Client=self.client,group=group[1])
                 if len(is_botList)>0:
-                    text = f"**⚠️ 您的频道内 [{group[3]}]({group[6]}) 包含以下黑名单内的机器人**\n\n"
+                    text = f"**⚠️ В вашем канале [{group[3]}]({group[6]}) обнаружены следующие боты из чёрного списка**\n\n"
                     for is_bot in is_botList:
-                        text += f"{is_bot[0]}-@`{is_bot[1]}`复制\n"
-                    text +="\n请删除以上机器人后重新提交"
-                    keyboard = [[InlineKeyboardButton("❌ 删除消息", callback_data=f"a/删除当前消息")]]
+                        text += f"{is_bot[0]}-@`{is_bot[1]}` (нажмите для копирования)\n"
+                    text +="\nУдалите указанных ботов и подайте заявку повторно"
+                    keyboard = [[InlineKeyboardButton("❌ Удалить сообщение", callback_data=f"a/удалить")]]
                     return await msg.reply_text(text=text,reply_markup=InlineKeyboardMarkup(keyboard))
-                await self.client.answer_callback_query(self.query.id, text='🎯提交成功,等待管理员审核', show_alert=True)
+                await self.client.answer_callback_query(self.query.id, text='🎯 Заявка отправлена, ожидайте проверки администратором', show_alert=True)
                 await fleet.put_group_one(id=group_id,fieet=fleet_id)
                 await self.sendNotify(fleet=fleetInfo,group=group)
                 await self.add_fleet(fleet=[fleetInfo[0]], mi_me=[fleetInfo[8]])
             elif group[10] ==10:
-                await self.client.answer_callback_query(self.query.id, text='⚠️多次违规已被禁用,请联系客服',show_alert=True)
+                await self.client.answer_callback_query(self.query.id, text='⚠️ Канал заблокирован за нарушения, обратитесь в поддержку',show_alert=True)
             else:
-                await self.client.answer_callback_query(self.query.id, text='⚠️请勿重复提交,耐心等待管理审核',show_alert=True)
+                await self.client.answer_callback_query(self.query.id, text='⚠️ Не отправляйте повторно, ожидайте решения администратора',show_alert=True)
         else:
-            await self.client.answer_callback_query(self.query.id,text="⛔错误:未找到该群/频道信息",show_alert=True)
+            await self.client.answer_callback_query(self.query.id,text="⛔ Ошибка: канал или группа не найдены",show_alert=True)
     async def sendNotify(self,**kwargs):
         fleet,group,user=kwargs["fleet"],kwargs["group"],self.data.get("user")
-        text = "**🔆收到新的入队申请**\n" \
-               f"**申请车队名:** {fleet[1]}\n" \
-               f"**车队类型:** 频道\n" \
-               f"**车队介绍:** {fleet[2]}\n" \
-               f"**当前/最大(成员):** {fleet[11]}/{fleet[6]}\n" \
-               f"**最低订阅:** {fleet[8] / 10000} W人\n" \
-               f"**最低阅读:** {fleet[9]}\n\n" \
-               f"**频道ID:** {group[1]}\n" \
-               f"**申请频道:** [{group[3]}]({group[6]})\n" \
-               f"**订阅人数:** {group[5]}\n" \
-               f"**申请人ID:** {user[1]}\n" \
-               f"**申请人名:** [{user[3]}](https://t.me/{user[2] or ''})\n" \
-               "**申请状态:**🔵 待审核"
-        keyboard = [[InlineKeyboardButton("🟢 通过审核", callback_data=f"a/通过审核?group={group[0]}"),
-                     InlineKeyboardButton("❌ 拒绝审核", callback_data=f"a/拒绝审核?group={group[0]}")],
-                    [InlineKeyboardButton("🚫 禁群", callback_data=f"a/禁群?group={group[0]}")],
+        text = "**🔆 Поступила новая заявка в подборку**\n" \
+               f"**Подборка:** {fleet[1]}\n" \
+               f"**Тип подборки:** Канал\n" \
+               f"**Описание:** {fleet[2]}\n" \
+               f"**Участники (сейчас/макс):** {fleet[11]}/{fleet[6]}\n" \
+               f"**Мин. подписчиков:** {fleet[8] / 1000} K\n" \
+               f"**Мин. просмотров:** {fleet[9]}\n\n" \
+               f"**ID канала:** {group[1]}\n" \
+               f"**Канал:** [{group[3]}]({group[6]})\n" \
+               f"**Подписчиков:** {group[5]}\n" \
+               f"**ID заявителя:** {user[1]}\n" \
+               f"**Заявитель:** [{user[3]}](https://t.me/{user[2] or ''})\n" \
+               "**Статус заявки:** 🔵 На проверке"
+        keyboard = [[InlineKeyboardButton("🟢 Одобрить", callback_data=f"a/одобрить?group={group[0]}"),
+                     InlineKeyboardButton("❌ Отклонить", callback_data=f"a/отклонить?group={group[0]}")],
+                    [InlineKeyboardButton("🚫 Заблокировать", callback_data=f"a/бан_мод?group={group[0]}")],
                     ]
-        await CarData().post_notify_msg(group=group,label="待审核")
+        await CarData().post_notify_msg(group=group,label="На проверке")
         if int(bot_config["notifyType"])==0:
             await self.client.send_message(chat_id=bot_config['adminGroup'], text=text,
                                            reply_markup=InlineKeyboardMarkup(keyboard), disable_web_page_preview=True)
@@ -238,4 +238,3 @@ class Channel:
                                                    disable_web_page_preview=True)
                 except RPCError as e:
                     print(e)
-

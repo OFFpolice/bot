@@ -1,4 +1,4 @@
-# 机器人库
+# Библиотеки бота
 from pyrogram import Client, filters
 from pyrogram.errors import RPCError,FloodWait,BadRequest,ChannelPrivate
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply, ReplyKeyboardMarkup, \
@@ -21,10 +21,10 @@ logging.basicConfig(
 redis_client = redis.Redis(host='172.18.0.2',port=6379,db=2,password='123456')
 
 bot_config = {
-    "botName":"未配置机器人",
-    "indexTxt":"未配置欢迎文案",
-    "botUserName":"未配置Bot",
-    "publicGroup":"未配置",
+    "botName":"Бот не настроен",
+    "indexTxt":"Приветственный текст не настроен",
+    "botUserName":"Бот не указан",
+    "publicGroup":"Не указан",
     "adminGroup":1,
     "msgGroup":1,
     "notifyType":1,

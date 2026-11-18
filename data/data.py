@@ -8,7 +8,7 @@ class Card:
         self.create_connection_pool()
     def create_connection_pool(self):
         try:
-            # 创建数据库连接池
+            # Создание пула подключений к базе данных
             self.pool = MySQLConnectionPool(
                 pool_name='my_pool',
                 pool_size=32,
@@ -18,10 +18,10 @@ class Card:
                 database='hutui6'
             )
         except Error as err:
-            print(f"create_connection_pool-Failed to create connection pool: {err}")
+            print(f"create_connection_pool-Не удалось создать пул подключений: {err}")
     def get_connection(self):
         try:
-            # 从连接池获取数据库连接
+            # Получение подключения к БД из пула
             connection = self.pool.get_connection()
             if connection.is_connected():
                 self.connect = connection
@@ -29,7 +29,7 @@ class Card:
             else:
                 return False
         except Error as err:
-            print(f"Failed to get database connection: {err}")
+            print(f"Не удалось получить подключение к базе данных: {err}")
             return False
     def close_connection(self):
         if self.connect:
@@ -42,7 +42,7 @@ class Card:
                 results = cursor.fetchall()
                 return results
         except Error as err:
-            print(f"execute_query-Failed to execute query: {err}")
+            print(f"execute_query-Ошибка выполнения запроса: {err}")
             self.connect.rollback()
             return []
         finally:
@@ -55,7 +55,7 @@ class Card:
                 self.connect.commit()
             return True
         except Error as err:
-            print(f"execute_update-Failed to execute update: {err}")
+            print(f"execute_update-Ошибка обновления данных: {err}")
             self.connect.rollback()
             return False
         finally:
@@ -71,12 +71,12 @@ class Card:
 db = Card()
 
 class ChatUser:
-    '''用户表操作类'''
+    '''Класс для работы с таблицей пользователей'''
 
     def __init__(self, Msg: Message = None):
         self.msg = Msg
     def get(self,from_user):
-        '''查询用户'''
+        '''Поиск пользователя'''
         user= db.select("SELECT * FROM chat_user WHERE chat_id=%s",(from_user.id,))
         if user:
             return user[0]
@@ -86,7 +86,7 @@ class ChatUser:
         full_name = f"{from_user.first_name or ''}{from_user.last_name or ''}"
         aad = "INSERT INTO chat_user (chat_id,username,full_name) " \
               "VALUES(%s,%s,%s)"
-        data = (from_user.id, from_user.username or '无', full_name)
+        data = (from_user.id, from_user.username or 'Нет', full_name)
         if db.insert(aad, data):
             return self.get(from_user=from_user)
         return []
@@ -140,7 +140,7 @@ class AdvertisingData:
                          ,(titel,url,id))
         return data
 class CarData:
-    # 管理后台 车队管理Car类数据
+    # Данные раздела управления подборками (админ-панель)
     def __init__(self, Msg: Message = None):
         self.msg = Msg
     async def get_fleet(self,**kwargs):
@@ -225,7 +225,7 @@ class CarData:
             return data[0]
         return []
 class GroupData:
-    # 管理后台Group 类数据
+    # Данные раздела управления группами и каналами
     async def get_group_list(self,**kwargs):
         LIMIT,OFFSET=kwargs.get('LIMIT'),kwargs.get('OFFSET')
         search=kwargs.get('search')
